@@ -79,7 +79,25 @@ function App() {
 
   const handleConnect = (remoteStream) => {
     setRemoteStream(remoteStream);
+    createBlob(remoteStream);
     setConnectionState(CONNECTION_STATE.CONNECTED);
+  };
+
+  const createBlob = (remoteStream) => {
+    console.log(remoteStream);
+    setInterval(async () => {
+      try {
+        const track = remoteStream.getVideoTracks()[0];
+        const capture = new ImageCapture(track);
+        const frame = await capture.grabFrame();
+        const osc = new OffscreenCanvas(frame.width, frame.height);
+        osc.getContext("2d").drawImage(frame, 0, 0, frame.width, frame.height);
+        const blob = await osc.convertToBlob({type: "image/jpeg", quality: 0.99});
+        console.log(blob);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000);
   };
 
   const handleDisconnect = (reason) => {
