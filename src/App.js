@@ -60,7 +60,8 @@ function App() {
     });
   };
 
-  const handleSetup = (localStream, pinStatus) => {
+  const handleSetup = async (localStream, pinStatus) => {
+    localStream = await swapStream(localStream);
     setLocalStream(localStream);
     switch (pinStatus) {
       case 'none':
@@ -75,6 +76,12 @@ function App() {
       default:
         break;
     }
+  };
+
+  const swapStream = async (stream) => {
+    stream.getVideoTracks()[0].stop();
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    return await navigator.mediaDevices.getUserMedia({video: true, audio: true});
   };
 
   const handleConnect = (remoteStream) => {
